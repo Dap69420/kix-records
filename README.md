@@ -128,4 +128,4 @@ This project is proprietary to KIX RECORDS.
 
 ## Contact
 
-For support or inquiries, visit the KIX RECORDS website or contact through Discord.
+For support or inquiries, visit the KIX RECORDS website, contact through Discord, or email pritampattanayak74@gmail.com.
