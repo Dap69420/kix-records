@@ -1,22 +1,4 @@
-import express from "express";
 import fetch from "node-fetch";
-import path from "path";
-import { fileURLToPath } from "url";
-import dotenv from "dotenv";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config();
-
-const app = express();
-const port = process.env.PORT || 3000;
-const isVercel = process.env.VERCEL === "1";
-const webhookUrl = process.env.DISCORD_WEBHOOK_URL || "";
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname));
 
 const clip = (value, max) => {
   if (!value) {
@@ -41,9 +23,16 @@ const generateTicketId = () => {
   return `DEMO-${generateSegment()}-${generateSegment()}`;
 };
 
-const submitDemo = async (req, res) => {
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    res.status(405).json({ ok: false, error: "Method not allowed" });
+    return;
+  }
+
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL || "";
   if (!webhookUrl) {
-    return res.status(500).json({ ok: false, error: "Webhook not configured" });
+    res.status(500).json({ ok: false, error: "Webhook not configured" });
+    return;
   }
 
   const payload = {
@@ -55,7 +44,6 @@ const submitDemo = async (req, res) => {
     bio: req.body.bio || "",
   };
 
-  // Format artists with their Spotify links for the embed
   const formatArtists = () => {
     if (!Array.isArray(payload.artists) || payload.artists.length === 0) {
       return "-";
@@ -99,22 +87,12 @@ const submitDemo = async (req, res) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      return res.status(500).json({ ok: false, error: errorText });
+      res.status(500).json({ ok: false, error: errorText });
+      return;
     }
 
-    return res.json({ ok: true, ticketId });
+    res.json({ ok: true, ticketId });
   } catch (error) {
-    return res.status(500).json({ ok: false, error: "Webhook error" });
+    res.status(500).json({ ok: false, error: "Webhook error" });
   }
-};
-
-app.post("/submit", submitDemo);
-app.post("/api/submit", submitDemo);
-
-if (!isVercel) {
-  app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-  });
 }
-
-export default app;
