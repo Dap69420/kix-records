@@ -8,9 +8,6 @@
       "maxDuration": 60
     }
   },
-  "env": [
-    "DISCORD_WEBHOOK_URL"
-  ],
   "headers": [
     {
       "source": "/api/(.*)",
