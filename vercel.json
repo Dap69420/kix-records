@@ -1,5 +1,15 @@
 {
   "version": 2,
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/submit-demo",
+      "destination": "/submit-demo.html"
+    }
+  ],
   "headers": [
     {
       "source": "/api/submit",
