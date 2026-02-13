@@ -1,7 +1,17 @@
 {
   "version": 2,
-  "buildCommand": "npm run build || true",
-  "devCommand": "node server.js",
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
+    }
+  ],
   "functions": {
     "server.js": {
       "memory": 1024,
@@ -10,7 +20,7 @@
   },
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/submit",
       "headers": [
         {
           "key": "Access-Control-Allow-Credentials",
