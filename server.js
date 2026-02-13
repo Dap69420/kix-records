@@ -15,7 +15,7 @@ const webhookUrl = process.env.DISCORD_WEBHOOK_URL || "";
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "public")));
 
 const clip = (value, max) => {
   if (!value) {
