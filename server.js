@@ -11,7 +11,6 @@ dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3000;
-const isVercel = process.env.VERCEL === "1";
 const webhookUrl = process.env.DISCORD_WEBHOOK_URL || "";
 
 app.use(express.json());
@@ -111,10 +110,6 @@ const submitDemo = async (req, res) => {
 app.post("/submit", submitDemo);
 app.post("/api/submit", submitDemo);
 
-if (!isVercel) {
-  app.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}`);
-  });
-}
-
-export default app;
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
