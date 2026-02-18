@@ -1479,14 +1479,24 @@ main {
 
   /* Modals */
   .modal-content {
+    /* Reset transform or positioning */
+    top: auto;
+    left: auto;
+    transform: none;
+    margin: auto;
+    
     width: 90vw;
-    top: 50%;
-    transform: translate(-50%, -50%);
     padding: 24px;
     max-height: 85vh;
+    overflow-y: auto;
   }
   
-  .modal-close {
+  .spotify-modal-content {
+    padding: 24px;
+    width: 90vw;
+  }
+  
+  .modal-close-x {
     top: 12px;
     right: 12px;
     font-size: 1.5rem;
