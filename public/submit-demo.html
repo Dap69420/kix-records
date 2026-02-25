@@ -212,6 +212,29 @@
       </div>
     </footer>
 
+    <!-- Chat Bot UI (Shared) -->
+    <div id="chat-widget">
+      <button id="chat-toggle-btn" type="button" aria-label="Open Chat">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/>
+        </svg>
+      </button>
+      <div id="chat-window" class="hidden">
+        <div class="chat-resize-handle" id="chat-resize-handle" title="Resize"></div>
+        <div class="chat-header">
+          <h3>KIX Assistant</h3>
+          <button id="chat-close-btn" type="button">&times;</button>
+        </div>
+        <div id="chat-messages">
+          <div class="message system">Hello! How can I help you today?</div>
+        </div>
+        <form id="chat-form">
+          <input type="text" id="chat-input" placeholder="Type a message..." required />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>

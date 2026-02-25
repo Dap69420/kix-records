@@ -761,3 +761,170 @@ if (form) {
   checkCooldown();
 }
 
+
+
+// Chat Widget Logic
+const chatToggleBtn = document.getElementById("chat-toggle-btn");
+const chatWindow = document.getElementById("chat-window");
+const chatCloseBtn = document.getElementById("chat-close-btn");
+const chatForm = document.getElementById("chat-form");
+const chatInput = document.getElementById("chat-input");
+const chatMessages = document.getElementById("chat-messages");
+const resizeHandle = document.getElementById("chat-resize-handle");
+
+// Resize Logic (Top-Left Handle)
+if (resizeHandle && chatWindow) {
+  let startX, startY, startWidth, startHeight;
+
+  const startResize = (e) => {
+    e.preventDefault();
+    startX = e.clientX;
+    startY = e.clientY;
+    // Get current computed style
+    const style = window.getComputedStyle(chatWindow);
+    startWidth = parseInt(style.width, 10);
+    startHeight = parseInt(style.height, 10);
+    
+    document.documentElement.addEventListener('mousemove', doResize, false);
+    document.documentElement.addEventListener('mouseup', stopResize, false);
+    chatWindow.style.transition = 'none'; // Disable transition for smooth resize
+  };
+
+  const doResize = (e) => {
+    // Top-Left resize means dragging left increases width, dragging up increases height
+    const deltaX = startX - e.clientX;
+    const deltaY = startY - e.clientY;
+    
+    const newWidth = startWidth + deltaX;
+    const newHeight = startHeight + deltaY;
+
+    // Apply strict minimums
+    if (newWidth >= 300) chatWindow.style.width = `${newWidth}px`;
+    if (newHeight >= 400) chatWindow.style.height = `${newHeight}px`;
+  };
+
+  const stopResize = () => {
+    document.documentElement.removeEventListener('mousemove', doResize, false);
+    document.documentElement.removeEventListener('mouseup', stopResize, false);
+    chatWindow.style.transition = ''; // Re-enable transition
+  };
+
+  resizeHandle.addEventListener('mousedown', startResize, false);
+}
+
+// Toggle Logic
+if (chatToggleBtn && chatWindow) {
+  chatToggleBtn.addEventListener("click", () => {
+    chatWindow.classList.toggle("hidden");
+    const isHidden = chatWindow.classList.contains("hidden");
+    chatToggleBtn.setAttribute("aria-expanded", !isHidden);
+    if (!isHidden && chatInput) {
+      setTimeout(() => chatInput.focus(), 100);
+    }
+  });
+
+  if (chatCloseBtn) {
+    chatCloseBtn.addEventListener("click", () => {
+      chatWindow.classList.add("hidden");
+      chatToggleBtn.setAttribute("aria-expanded", "false");
+    });
+  }
+}
+
+// Chat Interaction Logic
+if (chatForm) {
+  let conversationHistory = [];
+
+  const parseMarkdown = (text) => {
+    // Basic formatting
+    let html = text
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>');
+      
+    // Handle specific list formatting
+    const lines = html.split('\n');
+    let inList = false;
+    let newLines = [];
+    
+    for (let line of lines) {
+        let trimmed = line.trim();
+        // Check for bullet points (- or *)
+        if (trimmed.match(/^(?:-|\*)\s/)) {
+            if (!inList) {
+                newLines.push('<ul>');
+                inList = true;
+            }
+            newLines.push(`<li>${trimmed.substring(2)}</li>`);
+        } else {
+            if (inList) {
+                newLines.push('</ul>');
+                inList = false;
+            }
+            if (trimmed.length > 0) newLines.push(trimmed + '<br>');
+        }
+    }
+    if (inList) newLines.push('</ul>');
+    
+    return newLines.join('');
+  };
+
+  const addMessage = (text, sender) => {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = `message ${sender}`;
+    
+    if (sender === 'system') {
+        msgDiv.innerHTML = parseMarkdown(text);
+    } else {
+        msgDiv.textContent = text;
+    }
+    
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  };
+
+  chatForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const text = chatInput.value.trim();
+    if (!text) return;
+
+    // Add user message
+    addMessage(text, "user");
+    chatInput.value = "";
+    conversationHistory.push({ role: "user", content: text });
+
+    // Thinking indicator
+    const thinkingDiv = document.createElement("div");
+    thinkingDiv.className = "message system thinking";
+    thinkingDiv.textContent = "Thinking...";
+    chatMessages.appendChild(thinkingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: conversationHistory }),
+      });
+
+      if (chatMessages.contains(thinkingDiv)) {
+        chatMessages.removeChild(thinkingDiv);
+      }
+
+      if (!response.ok) throw new Error("API Error");
+
+      const data = await response.json();
+      const reply = data.choices?.[0]?.message?.content || "No response.";
+
+      addMessage(reply, "system");
+      conversationHistory.push({ role: "assistant", content: reply });
+
+    } catch (error) {
+      if (chatMessages.contains(thinkingDiv)) {
+        chatMessages.removeChild(thinkingDiv);
+      }
+      addMessage("Connection error. Please try again.", "system error");
+      console.error(error);
+    }
+  });
+}
+
