@@ -791,9 +791,9 @@ if (resizeHandle && chatWindow) {
   };
 
   const doResize = (e) => {
-    // Top-Left resize means dragging left increases width, dragging up increases height
-    const deltaX = startX - e.clientX;
-    const deltaY = startY - e.clientY;
+    // Top-Right resize (fixed at bottom-left): dragging right increases width, dragging up increases height
+    const deltaX = e.clientX - startX;
+    const deltaY = startY - e.clientY; // Dragging up reduces Y but increases height
     
     const newWidth = startWidth + deltaX;
     const newHeight = startHeight + deltaY;

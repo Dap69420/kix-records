@@ -1526,15 +1526,18 @@ main {
 #chat-widget {
   position: fixed;
   bottom: 24px;
-  right: 24px;
+  left: 24px;
+  right: auto;
   z-index: 1000;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: column-reverse; /* Changed: Button at bottom, window above */
+  align-items: flex-start;
   gap: 12px;
+  pointer-events: none; /* Crucial: allows clicks through the container when window is hidden */
 }
 
 #chat-toggle-btn {
+  pointer-events: auto; /* Re-enable clicks on the button */
   background: var(--mist);
   color: var(--ink);
   border: none;
@@ -1562,6 +1565,8 @@ main {
 #chat-window {
   width: 340px;
   height: 500px;
+  min-width: 300px;
+  min-height: 400px;
   max-width: calc(100vw - 48px);
   max-height: calc(100vh - 120px);
   background: rgba(18, 18, 18, 0.85);
@@ -1573,19 +1578,20 @@ main {
   flex-direction: column;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   overflow: hidden;
+  pointer-events: auto; /* Re-enable clicks on the window */
+  position: relative; /* Ensure handle is positioned relative to window */
   transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
-  transform-origin: bottom right;
-  /* Custom resize handle used instead of CSS resize */
+  transform-origin: bottom left;
 }
 
-/* Custom Resize Handle */
+/* Custom Resize Handle - Top Right */
 .chat-resize-handle {
   position: absolute;
   top: 0;
-  left: 0;
+  right: 0;
   width: 24px;
   height: 24px;
-  cursor: nw-resize;
+  cursor: ne-resize;
   z-index: 20;
 }
 
@@ -1594,11 +1600,11 @@ main {
   content: "";
   position: absolute;
   top: 6px;
-  left: 6px;
+  right: 6px;
   width: 0;
   height: 0;
   border-top: 8px solid rgba(255, 255, 255, 0.4);
-  border-right: 8px solid transparent;
+  border-right: 8px solid transparent; /* Changed to match top-right corner */
   pointer-events: none;
 }
 
