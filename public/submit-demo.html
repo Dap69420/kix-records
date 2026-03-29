@@ -24,7 +24,12 @@
         <a href="index.html#releases">Releases</a>
         <a href="index.html#contact">Contact</a>
       </nav>
-      <a class="cta" href="#demo">Submit demo</a>
+      <div class="auth-actions">
+        <a class="ghost hidden" data-admin-link href="admin.html">Admin</a>
+        <span class="auth-username hidden" data-auth-username></span>
+        <button class="ghost" type="button" data-auth-toggle data-open-auth>Login</button>
+        <a class="cta" href="#demo">Submit demo</a>
+      </div>
     </header>
 
     <main class="demo-page" id="demo">
@@ -212,6 +217,72 @@
       </div>
     </footer>
 
+    <!-- Auth Modal -->
+    <div class="modal" id="auth-modal">
+      <div class="modal-content auth-modal-content">
+        <div class="auth-container">
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab active" data-tab="login">Sign In</button>
+            <button type="button" class="auth-tab" data-tab="register">Create Account</button>
+          </div>
+
+          <!-- Login Form -->
+          <form id="login-form" class="auth-form active">
+            <div class="input-group full">
+              <label for="login-username">Username</label>
+              <input id="login-username" type="text" placeholder="your_username" required />
+            </div>
+            <div class="input-group full">
+              <label for="login-password">Password</label>
+              <input id="login-password" type="password" placeholder="Enter password" autocomplete="current-password" required />
+            </div>
+            <div class="input-group full">
+              <label for="login-security-question-text">Security Question</label>
+              <input id="login-security-question-text" type="text" readonly placeholder="Security question will appear after username/password" />
+            </div>
+            <div class="input-group full hidden" id="login-security-answer-group">
+              <label for="login-security-answer">Security Answer</label>
+              <input id="login-security-answer" type="text" placeholder="Enter your answer" />
+            </div>
+            <button type="submit" class="cta full" id="login-submit-btn">Continue</button>
+            <p class="auth-status" id="login-status"></p>
+          </form>
+
+          <!-- Register Form -->
+          <form id="register-form" class="auth-form">
+            <div class="input-group full">
+              <label for="register-username">Username</label>
+              <input id="register-username" type="text" placeholder="your_username" required />
+            </div>
+            <div class="input-group full">
+              <label for="register-security-question">Security Question</label>
+              <select id="register-security-question" required>
+                <option value="">Select a security question</option>
+                <option value="What is your favourite game?">What is your favourite game?</option>
+                <option value="What was your childhood nickname?">What was your childhood nickname?</option>
+                <option value="What city were you born in?">What city were you born in?</option>
+                <option value="What is your favourite artist?">What is your favourite artist?</option>
+              </select>
+            </div>
+            <div class="input-group full">
+              <label for="register-security-answer">Security Answer</label>
+              <input id="register-security-answer" type="text" placeholder="Enter your answer" required />
+            </div>
+            <div class="input-group full">
+              <label for="register-password">Password</label>
+              <input id="register-password" type="password" placeholder="At least 6 characters" autocomplete="new-password" required />
+            </div>
+            <div class="input-group full">
+              <label for="register-confirm-password">Confirm Password</label>
+              <input id="register-confirm-password" type="password" placeholder="Confirm password" autocomplete="new-password" required />
+            </div>
+            <button type="submit" class="cta full">Create Account</button>
+            <p class="auth-status" id="register-status"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Chat Bot UI (Shared) -->
     <div id="chat-widget">
       <button id="chat-toggle-btn" type="button" aria-label="Open Chat">
@@ -235,6 +306,7 @@
       </div>
     </div>
 
+    <script src="auth.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

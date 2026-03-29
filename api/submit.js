@@ -1,4 +1,7 @@
 import fetch from "node-fetch";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-this";
 
 const clip = (value, max) => {
   if (!value) {
@@ -27,6 +30,20 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(405).json({ ok: false, error: "Method not allowed" });
     return;
+  }
+
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ ok: false, error: "Authentication required. Please log in to submit a demo." });
+  }
+
+  let authUser;
+  try {
+    authUser = jwt.verify(token, JWT_SECRET);
+  } catch (_error) {
+    return res.status(403).json({ ok: false, error: "Invalid or expired token" });
   }
 
   const webhookUrl = process.env.DISCORD_WEBHOOK_URL || "";
@@ -71,6 +88,8 @@ export default async function handler(req, res) {
             description: `A fresh submission just landed in the intake queue.\n**Ticket ID: \`\`\`${ticketId}\`\`\`**`,
             color: getRandomColor(),
             fields: [
+              { name: "Account", value: clip(authUser.username || "unknown", 1024), inline: true },
+              { name: "Role", value: clip(authUser.role || "User", 1024), inline: true },
               { name: "Legal Name", value: clip(payload.legalName, 1024) || "-", inline: true },
               { name: "Release Title", value: clip(payload.releaseTitle, 1024) || "-", inline: true },
               { name: "Artists", value: formatArtists(), inline: false },
